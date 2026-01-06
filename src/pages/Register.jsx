@@ -107,7 +107,9 @@ const styles = {
   label: { fontSize: "14px", fontWeight: "bold", color: "#34495e" },
   input: { padding: "12px", borderRadius: "5px", border: "1px solid #ddd", fontSize: "16px", outline: "none" },
   button: { padding: "12px", background: "#2c3e50", color: "white", border: "none", borderRadius: "5px", cursor: "pointer", fontWeight: "bold", marginTop: "10px" },
-  adminNote: { backgroundColor: "#f9f9f9", padding: "10px", borderRadius: "5px", color: "#7f8c8d", fontSize: "12px", textAlign: "center", border: "1px solid #eee" },
+" },
+>>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
+"12px", textAlign: "center", border: "1px solid #eee" },
   footer: { textAlign: "center", marginTop: "20px", fontSize: "14px" },
   link: { color: "#3498db", textDecoration: "none", fontWeight: "bold" }
 };

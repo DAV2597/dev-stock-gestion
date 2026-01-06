@@ -135,8 +135,12 @@ export default function DashboardAdjoint() {
         </div>
       </nav>
 
-      <div style={{...styles.content, padding: isMobile ? "15px" : "30px"}}>
-        <div style={{...styles.tabContainer, flexWrap: isMobile ? "wrap" : "nowrap"}}>
+      <d<<<<<<< HEAD
+            <button onClick={() => signOut(auth)} style={styles.logoutBtn}>Deconnexion</button>
+=======
+            <button onClick={() => signOut(auth)} style={styles.logoutBtn}>Sortir</button>
+>>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
+es.tabContainer, flexWrap: isMobile ? "wrap" : "nowrap"}}>
           <button style={activeTab === "stock" ? styles.tabActive : styles.tab} onClick={() => setActiveTab("stock")}>📦 Stock & Inventaire</button>
           <button style={activeTab === "ventes" ? styles.tabActive : styles.tab} onClick={() => setActiveTab("ventes")}>👥 Créances Clients</button>
         </div>

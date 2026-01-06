@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
+<<<<<<< HEAD
 import { db, auth } from "../firebase/config";
+=======
+import { db } from "../firebase/config";
+>>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
 import { 
   collection, 
   query, 
@@ -11,7 +15,10 @@ import {
   updateDoc, 
   serverTimestamp 
 } from "firebase/firestore";
+<<<<<<< HEAD
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+=======
+>>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
 import { useAuth } from "../context/AuthContext";
 
 export default function GestionEquipe() {
@@ -21,6 +28,10 @@ export default function GestionEquipe() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+<<<<<<< HEAD
+=======
+    // On utilise l'ID de l'admin (boutique) pour filtrer
+>>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
     const currentAdminId = user?.adminId || user?.uid;
     if (!currentAdminId) return;
 
@@ -40,6 +51,7 @@ export default function GestionEquipe() {
   const handleAddMember = async (e) => {
     e.preventDefault();
     setLoading(true);
+<<<<<<< HEAD
 
     // Sauvegarde des infos de l'admin pour se reconnecter après la création
     const adminEmail = user.email;
@@ -62,6 +74,13 @@ export default function GestionEquipe() {
       // On utilise l'UID comme identifiant de document pour une sécurité maximale
       await setDoc(doc(db, "users", newUid), {
         uid: newUid,
+=======
+    try {
+      const empEmail = newEmp.email.toLowerCase().trim();
+      const currentAdminId = user?.adminId || user?.uid;
+      
+      await setDoc(doc(db, "users", empEmail), {
+>>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
         email: empEmail,
         password: newEmp.password,
         role: newEmp.role,
@@ -71,11 +90,15 @@ export default function GestionEquipe() {
         avertissement: ""
       });
 
+<<<<<<< HEAD
       // 3. RECONNEXION DE L'ADMIN
       // (Car createUserWithEmailAndPassword connecte automatiquement le nouveau compte)
       await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
 
       alert("Compte " + newEmp.role + " activé et créé avec succès !");
+=======
+      alert("Compte employé créé avec succès !");
+>>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
       setNewEmp({ email: "", password: "", role: "secretaire" });
     } catch (err) {
       alert("Erreur : " + err.message);
@@ -87,7 +110,10 @@ export default function GestionEquipe() {
   const deleteMember = async (id) => {
     if (window.confirm("Supprimer cet accès ?")) {
       await deleteDoc(doc(db, "users", id));
+<<<<<<< HEAD
       alert("Profil supprimé de la base de données.");
+=======
+>>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
     }
   };
 
@@ -101,6 +127,7 @@ export default function GestionEquipe() {
       <h2 style={styles.title}>👥 Ma Gestion d'Équipe</h2>
       <form onSubmit={handleAddMember} style={styles.form}>
         <div style={styles.inputGroup}>
+<<<<<<< HEAD
           <input 
             type="email" 
             placeholder="Email de l'employé" 
@@ -128,6 +155,15 @@ export default function GestionEquipe() {
           <button type="submit" disabled={loading} style={styles.addBtn}>
             {loading ? "Création..." : "Ajouter l'accès"}
           </button>
+=======
+          <input type="email" placeholder="Email" value={newEmp.email} onChange={e => setNewEmp({...newEmp, email: e.target.value})} required style={styles.input} />
+          <input type="text" placeholder="Mot de passe" value={newEmp.password} onChange={e => setNewEmp({...newEmp, password: e.target.value})} required style={styles.input} />
+          <select value={newEmp.role} onChange={e => setNewEmp({...newEmp, role: e.target.value})} style={styles.select}>
+            <option value="secretaire">Secrétaire</option>
+            <option value="adjoint">Adjoint</option>
+          </select>
+          <button type="submit" disabled={loading} style={styles.addBtn}>{loading ? "..." : "Ajouter"}</button>
+>>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
         </div>
       </form>
 
@@ -136,12 +172,17 @@ export default function GestionEquipe() {
           <div key={emp.id} style={styles.item}>
             <div style={styles.info}>
               <span style={styles.empEmail}>{emp.email}</span>
+<<<<<<< HEAD
               <span style={styles.empRole}>
                 {emp.role === "ajoint" ? "🔹 Ajoint" : "🔸 Secrétaire"}
               </span>
               {emp.avertissement && (
                 <div style={styles.warnBadge}>📢 {emp.avertissement}</div>
               )}
+=======
+              <span style={styles.empRole}>{emp.role === "adjoint" ? "🔹 Adjoint" : "🔸 Secrétaire"}</span>
+              {emp.avertissement && <div style={styles.warnBadge}>📢 {emp.avertissement}</div>}
+>>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
             </div>
             <div style={styles.actions}>
               <button onClick={() => sendNote(emp.id)} style={styles.msgBtn}>📢</button>
@@ -159,6 +200,7 @@ const styles = {
   title: { margin: "0 0 20px 0", color: "#2c3e50" },
   form: { marginBottom: "30px", padding: "15px", background: "#f8f9fa", borderRadius: "8px" },
   inputGroup: { display: "flex", gap: "10px", flexWrap: "wrap" },
+<<<<<<< HEAD
   input: { padding: "10px", borderRadius: "6px", border: "1px solid #ddd", flex: "1", minWidth: "150px" },
   select: { padding: "10px", borderRadius: "6px", border: "1px solid #ddd", cursor: "pointer" },
   addBtn: { background: "#27ae60", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" },
@@ -170,4 +212,17 @@ const styles = {
   actions: { display: "flex", gap: "8px" },
   msgBtn: { background: "#f1c40f", border: "none", padding: "8px", borderRadius: "4px", cursor: "pointer" },
   delBtn: { background: "#e74c3c", color: "#fff", border: "none", padding: "8px", borderRadius: "4px", cursor: "pointer" }
+=======
+  input: { padding: "10px", borderRadius: "6px", border: "1px solid #ddd", flex: "1" },
+  select: { padding: "10px", borderRadius: "6px", border: "1px solid #ddd" },
+  addBtn: { background: "#27ae60", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "6px", cursor: "pointer" },
+  item: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px", border: "1px solid #eee", borderRadius: "8px", marginBottom: "10px" },
+  info: { display: "flex", flexDirection: "column" },
+  empEmail: { fontWeight: "bold" },
+  empRole: { fontSize: "11px", color: "#7f8c8d", textTransform: "uppercase" },
+  warnBadge: { fontSize: "12px", background: "#fff3cd", padding: "4px", borderRadius: "4px", marginTop: "5px" },
+  actions: { display: "flex", gap: "5px" },
+  msgBtn: { background: "#f1c40f", border: "none", padding: "8px", borderRadius: "4px" },
+  delBtn: { background: "#e74c3c", color: "#fff", border: "none", padding: "8px", borderRadius: "4px" }
+>>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
 };
