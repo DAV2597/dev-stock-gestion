@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [shopName, setShopName] = useState(""); // Nouveau : Nom de la boutique
+  const [shopName, setShopName] = useState(""); 
   const navigate = useNavigate();
 
   // --- LOGIQUE RESPONSIVE ---
@@ -23,7 +23,7 @@ export default function Register() {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
-        email,
+        email.trim(),
         password
       );
 
@@ -31,11 +31,10 @@ export default function Register() {
 
       // LOGIQUE MULTI-BOUTIQUE :
       // Chaque personne qui s'inscrit ici est un ADMIN de sa propre boutique.
-      // Son 'adminId' est son propre UID.
       await setDoc(doc(db, "users", user.uid), {
-        email: email.toLowerCase(),
-        role: "admin", // Tous les nouveaux inscrits sont admins de leur shop
-        adminId: user.uid, // C'est l'identifiant unique de sa boutique
+        email: email.toLowerCase().trim(),
+        role: "admin", 
+        adminId: user.uid, 
         shopName: shopName || "Ma Boutique",
         createdAt: new Date(),
       });
@@ -107,9 +106,7 @@ const styles = {
   label: { fontSize: "14px", fontWeight: "bold", color: "#34495e" },
   input: { padding: "12px", borderRadius: "5px", border: "1px solid #ddd", fontSize: "16px", outline: "none" },
   button: { padding: "12px", background: "#2c3e50", color: "white", border: "none", borderRadius: "5px", cursor: "pointer", fontWeight: "bold", marginTop: "10px" },
-" },
->>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
-"12px", textAlign: "center", border: "1px solid #eee" },
+  adminNote: { background: "#f8f9fa", padding: "10px", borderRadius: "5px", fontSize: "12px", textAlign: "center", border: "1px solid #eee", color: "#7f8c8d" },
   footer: { textAlign: "center", marginTop: "20px", fontSize: "14px" },
   link: { color: "#3498db", textDecoration: "none", fontWeight: "bold" }
 };

@@ -1,11 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
-<<<<<<< HEAD
 import { auth, db } from "../firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
-=======
-import { onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "../firebase/config";
->>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
 import { doc, getDoc } from "firebase/firestore";
 
 const AuthContext = createContext();
@@ -16,50 +11,37 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-<<<<<<< HEAD
-    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // 1. Chercher d'abord par UID (cas de l'Admin)
-        let userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
-        let userData = userDoc.data();
-
-        // 2. Si non trouvé, chercher par Email (cas des employés)
-        if (!userDoc.exists()) {
-          const emailDoc = await getDoc(doc(db, "users", firebaseUser.email.toLowerCase()));
-          userData = emailDoc.data();
-        }
-
-        if (userData) {
-          setUser({ ...firebaseUser, ...userData });
-          setRole(userData.role); // Ici on récupère 'admin', 'ajoint' ou 'secretaire'
-        } else {
-          setUser(firebaseUser);
-          setRole(null);
-=======
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
         try {
-          const ref = doc(db, "users", currentUser.uid);
-          const snap = await getDoc(ref);
-          
-          if (snap.exists()) {
-            const userData = snap.data();
-            // On crée un objet utilisateur "augmenté" avec ses infos Firestore
+          // 1. Chercher d'abord par UID (cas de l'Admin qui s'est enregistré lui-même)
+          let userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+          let userData = userDoc.data();
+
+          // 2. Si non trouvé par UID, chercher par Email (cas des employés créés manuellement)
+          if (!userDoc.exists()) {
+            const emailDoc = await getDoc(doc(db, "users", firebaseUser.email.toLowerCase()));
+            if (emailDoc.exists()) {
+              userData = emailDoc.data();
+            }
+          }
+
+          if (userData) {
+            // On crée un objet utilisateur complet avec les infos Firebase + Firestore
             setUser({
-              uid: currentUser.uid,
-              email: currentUser.email,
-              adminId: userData.adminId, // ID de la boutique
-              shopName: userData.shopName,
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
               ...userData
             });
-            setRole(userData.role);
+            setRole(userData.role); // 'admin', 'ajoint' ou 'secretaire'
           } else {
-            setUser(currentUser);
+            // Utilisateur connecté mais sans profil Firestore trouvé
+            setUser(firebaseUser);
+            setRole(null);
           }
         } catch (error) {
           console.error("Erreur AuthContext:", error);
-          setUser(currentUser);
->>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
+          setUser(firebaseUser);
         }
       } else {
         setUser(null);
@@ -68,11 +50,7 @@ export function AuthProvider({ children }) {
       setLoading(false);
     });
 
-<<<<<<< HEAD
-    return () => unsub();
-=======
     return () => unsubscribe();
->>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
   }, []);
 
   return (
@@ -82,10 +60,4 @@ export function AuthProvider({ children }) {
   );
 }
 
-<<<<<<< HEAD
 export const useAuth = () => useContext(AuthContext);
-=======
-export function useAuth() {
-  return useContext(AuthContext);
-}
->>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9

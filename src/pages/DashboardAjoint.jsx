@@ -35,13 +35,13 @@ export default function DashboardAdjoint() {
   useEffect(() => {
     if (!user?.adminId) return;
 
-    // --- CHARGEMENT DES PRODUITS DE LA BOUTIQUE ---
+    // --- CHARGEMENT DES PRODUITS ---
     const qProd = query(collection(db, "produits"), where("adminId", "==", user.adminId));
     const unsubProd = onSnapshot(qProd, (snap) => {
       setProducts(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
 
-    // --- CHARGEMENT DES TRANSACTIONS DE LA BOUTIQUE ---
+    // --- CHARGEMENT DES TRANSACTIONS ---
     const qTrans = query(collection(db, "transactions"), where("adminId", "==", user.adminId));
     const unsubTrans = onSnapshot(qTrans, (snap) => {
       setTransactions(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
@@ -50,7 +50,6 @@ export default function DashboardAdjoint() {
     return () => { unsubProd(); unsubTrans(); };
   }, [user]);
 
-  // --- SAUVEGARDE OU MODIFICATION PRODUIT ---
   const handleSaveProduct = async (e) => {
     e.preventDefault();
     if (!user?.adminId) return alert("Session expirée");
@@ -61,7 +60,7 @@ export default function DashboardAdjoint() {
         prix: Number(newProd.prix),
         action: Number(newProd.action),
         imageUrl: newProd.imageUrl,
-        adminId: user.adminId, // Liaison boutique
+        adminId: user.adminId,
         updatedAt: serverTimestamp()
       };
 
@@ -109,7 +108,6 @@ export default function DashboardAdjoint() {
     setImagePreview(null);
   };
 
-  // --- RÈGLEMENT D'UNE DETTE ---
   const handlePayDebt = async (transactionId) => {
     if (!window.confirm("Le client a-t-il réglé la totalité de sa dette ?")) return;
     try {
@@ -131,16 +129,12 @@ export default function DashboardAdjoint() {
         </div>
         <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
             <span style={{fontSize: '11px', color: '#bdc3c7'}}>{user?.email}</span>
-            <button onClick={() => signOut(auth)} style={styles.logoutBtn}>Deconnexion</button>
+            <button onClick={() => signOut(auth)} style={styles.logoutBtn}>Déconnexion</button>
         </div>
       </nav>
 
-      <d<<<<<<< HEAD
-            <button onClick={() => signOut(auth)} style={styles.logoutBtn}>Deconnexion</button>
-=======
-            <button onClick={() => signOut(auth)} style={styles.logoutBtn}>Sortir</button>
->>>>>>> 3bd0c86ee8b1bb7ff6441068087eff367a8b7bd9
-es.tabContainer, flexWrap: isMobile ? "wrap" : "nowrap"}}>
+      <div style={{...styles.content, padding: isMobile ? "15px" : "30px"}}>
+        <div style={{...styles.tabContainer, flexWrap: isMobile ? "wrap" : "nowrap"}}>
           <button style={activeTab === "stock" ? styles.tabActive : styles.tab} onClick={() => setActiveTab("stock")}>📦 Stock & Inventaire</button>
           <button style={activeTab === "ventes" ? styles.tabActive : styles.tab} onClick={() => setActiveTab("ventes")}>👥 Créances Clients</button>
         </div>
