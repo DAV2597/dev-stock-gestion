@@ -82,11 +82,11 @@ export default function DashboardAdmin() {
           <div style={styles.adminBadge}>{user?.email}</div>
         </div>
         
-        <nav style={{...styles.sideNav, display: isMobile ? 'flex' : 'block', overflowX: isMobile ? 'auto' : 'visible', fontSize: isMobile ? "7.5px": "16px",}}>
-          <div onClick={() => {setView('dashboard'); setSearchTerm("");}} style={view === 'dashboard' ? styles.activeLink : styles.link}>📊 Tableau de bord</div>
-          <div onClick={() => {setView('inventaire'); setSearchTerm("");}} style={view === 'inventaire' ? styles.activeLink : styles.link}>📦 Mon Stock</div>
-          <div onClick={() => {setView('dettes'); setSearchTerm("");}} style={view === 'dettes' ? styles.activeLink : styles.link}>👥 Mes Créances</div>
-          <div onClick={() => {setView('equipe'); setSearchTerm("");}} style={view === 'equipe' ? styles.activeLink : styles.link}>👥 Mon Équipe</div>
+        <nav style={{...styles.sideNav, display: isMobile ? 'flex' : 'block',gap: isMobile?"5px":"0rem", overflowX: isMobile ? 'auto' : 'visible', fontSize: isMobile ? "9px": "16px",}}>
+          <div onClick={() => {setView('dashboard'); setSearchTerm("");}} style={view === 'dashboard' ? styles.activeLink : styles.link}>📊 Tableau de bord</div><br />
+          <div onClick={() => {setView('inventaire'); setSearchTerm("");}} style={view === 'inventaire' ? styles.activeLink : styles.link}>📦 Mon Stock</div><br />
+          <div onClick={() => {setView('dettes'); setSearchTerm("");}} style={view === 'dettes' ? styles.activeLink : styles.link}>👥 Mes Créances</div><br />
+          <div onClick={() => {setView('equipe'); setSearchTerm("");}} style={view === 'equipe' ? styles.activeLink : styles.link}>👥 Mon Équipe</div><br />
           <div onClick={() => {setView('messages'); setSearchTerm("");}} style={view === 'messages' ? styles.activeLink : styles.link}>
             💬 Alertes {stats.alertes > 0 && <span style={styles.notifBadge}>{stats.alertes}</span>}
           </div>
@@ -256,7 +256,7 @@ const styles = {
   logo: { fontSize: "20px", letterSpacing: '1px', margin: 0, fontWeight: '800' },
   adminBadge: { fontSize: '9px', background: '#3498db', padding: '2px 8px', borderRadius: '4px', display: 'inline-block', marginTop: '5px' },
   sideNav: { flex: 1 , width: "100%"},
-  link: {margin: "0px 5px", cursor: "pointer", borderRadius: "10px", marginBottom: "8px", color: "#a0aec0"},
+  link: { cursor: "pointer", borderRadius: "10px", color: "#a0aec0"},
   activeLink: { borderRadius: "10px", color: "#fff", fontWeight: "600" },
   notifBadge: { backgroundColor: '#e74c3c', padding: '2px 7px', borderRadius: '50%', fontSize: '11px' },
   footerNav: { borderTop: '1px solid #2d3748', paddingTop: '20px' },
