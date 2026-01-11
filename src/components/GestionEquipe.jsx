@@ -126,8 +126,8 @@ export default function GestionEquipe() {
             onChange={e => setNewEmp({...newEmp, role: e.target.value})} 
             style={styles.select}
           >
-            <option value="secretaire">Secrétaire</option>
-            <option value="adjoint">Adjoint</option>
+            <option value="secretaire">Vendeur</option>
+            <option value="ajoint">Adjoint</option>
           </select>
           <button type="submit" disabled={loading} style={styles.addBtn}>
             {loading ? "Création..." : "Ajouter l'accès"}
@@ -144,7 +144,7 @@ export default function GestionEquipe() {
               <div style={styles.info}>
                 <span style={styles.empEmail}>{emp.email}</span>
                 <span style={styles.empRole}>
-                  {emp.role === "adjoint" ? "🔹 Adjoint" : "🔸 Secrétaire"}
+                  {emp.role === "ajoint" ? "🔹 Adjoint" : "🔸 Secrétaire"}
                 </span>
                 {emp.avertissement && (
                   <div style={styles.warnBadge}>📢 {emp.avertissement}</div>
@@ -169,7 +169,7 @@ const styles = {
   inputGroup: { display: "flex", gap: "10px", flexWrap: "wrap" },
   input: { padding: "10px", borderRadius: "6px", border: "1px solid #ddd", flex: "1", minWidth: "150px" },
   select: { padding: "10px", borderRadius: "6px", border: "1px solid #ddd", cursor: "pointer" },
-  addBtn: { background: "#27ae60", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" },
+  addBtn: { background: "#2c3e50", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" },
   list: { display: "flex", flexDirection: "column", gap: "10px" },
   item: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px", border: "1px solid #eee", borderRadius: "8px" },
   info: { display: "flex", flexDirection: "column" },

@@ -125,7 +125,7 @@ export default function DashboardAdjoint() {
       <nav style={{...styles.navbar, padding: isMobile ? "10px 15px" : "15px 30px"}}>
         <div style={{...styles.logo, fontSize: isMobile ? "18px" : "22px"}}>
           {user?.shopName || "BOUTIQUE"} <br/>
-          <span style={{color: '#3498db', fontSize: '11px', fontWeight: 'normal'}}>GESTION ADJOINTE</span>
+          {/* <span style={{color: '#3498db', fontSize: '11px', fontWeight: 'normal'}}>GESTION ADJOINTE</span> */}
         </div>
         <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
             <span style={{fontSize: '11px', color: '#bdc3c7'}}>{user?.email}</span>
@@ -216,7 +216,7 @@ export default function DashboardAdjoint() {
 
         {isModalOpen && (
           <div style={styles.overlay}>
-            <div style={{...styles.modal, width: isMobile ? "90%" : "450px", padding: "25px"}}>
+            <div style={{...styles.modal, width: isMobile ? "82%" : "450px", padding: "25px"}}>
               <h3 style={{marginTop: 0}}>{editingId ? "Modifier" : "Ajouter un"} Produit</h3>
               <form onSubmit={handleSaveProduct} style={styles.form}>
                 <label style={styles.label}>Nom du produit</label>
@@ -229,7 +229,7 @@ export default function DashboardAdjoint() {
                    </div>
                    <div style={{flex: 1}}>
                       <label style={styles.label}>Quantité en stock</label>
-                      <input type="number" placeholder="0" value={newProd.action} style={styles.input} required onChange={e => setNewProd({...newProd, action: e.target.value})} />
+                      <input type="number" placeholder="0" value={newProd.action} style={{padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: '14px' ,width: isMobile ? "100px" : "200px"}} required onChange={e => setNewProd({...newProd, action: e.target.value})} />
                    </div>
                 </div>
 
@@ -257,11 +257,11 @@ const styles = {
   logoutBtn: { background: "#e74c3c", color: "white", border: "none", padding: "8px 15px", borderRadius: "5px", cursor: "pointer", fontSize: '12px' },
   content: { maxWidth: '1200px', margin: '0 auto' },
   tabContainer: { display: "flex", gap: "10px", marginBottom: "25px" },
-  tab: { padding: "12px 20px", background: "#edf2f7", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: '14px', color: '#4a5568' },
-  tabActive: { padding: "12px 20px", background: "#3498db", color: "white", borderRadius: "8px", fontWeight: "bold", fontSize: '14px' },
+  tab: { padding: "12px 10px", background: "#edf2f7", border: "none", borderRadius: "2px", cursor: "pointer", fontSize: '14px', color: '#4a5568' },
+  tabActive: { padding: "12px 10px", border: "none", background: "#2c3e50", color: "white",  fontWeight: "bold", fontSize: '14px' },
   section: { background: "white", padding: "20px", borderRadius: "12px", boxShadow: "0 2px 10px rgba(0,0,0,0.03)" },
   sectionHeader: { display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center", gap: '15px' },
-  addBtn: { background: "#2ecc71", color: "white", border: "none", padding: "10px 18px", borderRadius: "8px", cursor: "pointer", fontWeight: '600' },
+  addBtn: { background: "#2c3e50", color: "white", border: "none", padding: "10px 18px", borderRadius: "8px", cursor: "pointer", fontWeight: '600' },
   table: { width: "100%", borderCollapse: "collapse" },
   thr: { background: "#f8fafc" },
   th: { textAlign: "left", padding: "12px", borderBottom: "2px solid #edf2f7", fontSize: "13px", color: '#718096' },
@@ -271,7 +271,7 @@ const styles = {
   noImg: { width: "45px", height: "45px", background: "#f1f5f9", borderRadius: "8px", display: 'flex', alignItems: 'center', justifyContent: 'center' },
   editBtn: { background: "#ebf8ff", color: "#3182ce", border: "none", padding: "6px 12px", borderRadius: "6px", marginRight: "5px", cursor: "pointer", fontSize: '12px' },
   deleteBtn: { background: "#fff5f5", color: "#e53e3e", border: "none", padding: "6px 12px", borderRadius: "6px", cursor: "pointer", fontSize: '12px' },
-  payBtn: { background: "#27ae60", color: "white", border: "none", padding: "8px 12px", borderRadius: "6px", cursor: "pointer", fontSize: '12px', fontWeight: 'bold' },
+  payBtn: { background: "#2c3e50", color: "white", border: "none", padding: "8px 12px", borderRadius: "6px", cursor: "pointer", fontSize: '12px', fontWeight: 'bold' },
   overlay: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.6)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 },
   modal: { background: "white", borderRadius: "15px", boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' },
   form: { display: "flex", flexDirection: "column", gap: "12px" },
@@ -280,6 +280,6 @@ const styles = {
   preview: { width: "100%", height: "100px", objectFit: "contain", marginTop: "10px", borderRadius: '8px', border: '1px dashed #cbd5e0' },
   modalButtons: { display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "15px" },
   cancelBtn: { padding: "10px 20px", background: "#f1f5f9", border: "none", borderRadius: "8px", cursor: "pointer", color: '#4a5568' },
-  saveBtn: { padding: "10px 20px", background: "#3498db", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: 'bold' },
+  saveBtn: { padding: "10px 20px", background: "#2c3e50", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: 'bold' },
   empty: { textAlign: 'center', padding: '20px', color: '#a0aec0', fontSize: '14px' }
 };

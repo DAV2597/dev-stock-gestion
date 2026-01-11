@@ -79,10 +79,10 @@ export default function DashboardAdmin() {
       <aside style={{...styles.sidebar, width: isMobile ? '100%' : '280px'}}>
         <div style={styles.logoArea}>
           <h2 style={styles.logo}>{user?.shopName || "DEV STOCK"}</h2>
-          <div style={styles.adminBadge}>ADMINISTRATEUR</div>
+          <div style={styles.adminBadge}>{user?.email}</div>
         </div>
         
-        <nav style={{...styles.sideNav, display: isMobile ? 'flex' : 'block', overflowX: isMobile ? 'auto' : 'visible'}}>
+        <nav style={{...styles.sideNav, display: isMobile ? 'flex' : 'block', overflowX: isMobile ? 'auto' : 'visible', fontSize: isMobile ? "7.5px": "16px",}}>
           <div onClick={() => {setView('dashboard'); setSearchTerm("");}} style={view === 'dashboard' ? styles.activeLink : styles.link}>📊 Tableau de bord</div>
           <div onClick={() => {setView('inventaire'); setSearchTerm("");}} style={view === 'inventaire' ? styles.activeLink : styles.link}>📦 Mon Stock</div>
           <div onClick={() => {setView('dettes'); setSearchTerm("");}} style={view === 'dettes' ? styles.activeLink : styles.link}>👥 Mes Créances</div>
@@ -94,7 +94,7 @@ export default function DashboardAdmin() {
 
         <div style={styles.footerNav}>
           <div style={styles.userInfo}>{user?.email}</div>
-          <button onClick={() => signOut(auth)} style={styles.logoutBtn}>Quitter</button>
+          <button onClick={() => signOut(auth)} style={styles.logoutBtn}>Déconnexion</button>
         </div>
       </aside>
 
@@ -255,9 +255,9 @@ const styles = {
   logoArea: { textAlign: 'center', marginBottom: '40px' },
   logo: { fontSize: "20px", letterSpacing: '1px', margin: 0, fontWeight: '800' },
   adminBadge: { fontSize: '9px', background: '#3498db', padding: '2px 8px', borderRadius: '4px', display: 'inline-block', marginTop: '5px' },
-  sideNav: { flex: 1 },
-  link: { padding: "14px 18px", cursor: "pointer", borderRadius: "10px", marginBottom: "8px", color: "#a0aec0" },
-  activeLink: { padding: "14px 18px", backgroundColor: "#3498db", borderRadius: "10px", color: "white", fontWeight: "600" },
+  sideNav: { flex: 1 , width: "100%"},
+  link: {margin: "0px 5px", cursor: "pointer", borderRadius: "10px", marginBottom: "8px", color: "#a0aec0"},
+  activeLink: { borderRadius: "10px", color: "#fff", fontWeight: "600" },
   notifBadge: { backgroundColor: '#e74c3c', padding: '2px 7px', borderRadius: '50%', fontSize: '11px' },
   footerNav: { borderTop: '1px solid #2d3748', paddingTop: '20px' },
   userInfo: { fontSize: '11px', color: '#718096', marginBottom: '10px', textAlign: 'center' },
