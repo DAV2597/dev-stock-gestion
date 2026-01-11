@@ -122,6 +122,10 @@ export default function DashboardAdjoint() {
 
   return (
     <div style={styles.container}>
+      {/* Alerte message de l'Admin */}
+      {user?.avertissement && (
+        <div style={styles.adminNote}>📢 <b>Note de la direction :</b> {user.avertissement}</div>
+      )}
       <nav style={{...styles.navbar, padding: isMobile ? "10px 15px" : "15px 30px"}}>
         <div style={{...styles.logo, fontSize: isMobile ? "18px" : "22px"}}>
           {user?.shopName || "BOUTIQUE"} <br/>
