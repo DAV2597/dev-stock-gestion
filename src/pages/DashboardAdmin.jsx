@@ -19,7 +19,8 @@ export default function DashboardAdmin() {
   const [stats, setStats] = useState({ 
     ventesUSD: 0, ventesCDF: 0, 
     dettesUSD: 0, dettesCDF: 0, 
-    alertes: 0 
+    alertes: 0,
+    beneficeUSD: 0, beneficeCDF: 0 
   });
 
   const [view, setView] = useState('dashboard');
@@ -35,7 +36,8 @@ export default function DashboardAdmin() {
   const [editingExpense, setEditingExpense] = useState(null); 
   
   const [venteData, setVenteData] = useState({ client: "", phone: "", productId: "", qte: 1, paye: 0, devise: "USD" });
-  const [prodData, setProdData] = useState({ nom: "", prix: "", action: "", imageUrl: "", devise: "USD" });
+  // AJOUT : prixAchat dans le state prodData
+  const [prodData, setProdData] = useState({ nom: "", prixAchat: "", prix: "", action: "", imageUrl: "", devise: "USD" });
   const [expenseData, setExpenseData] = useState({ motif: "", montant: "", devise: "USD" });
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -63,17 +65,44 @@ export default function DashboardAdmin() {
     return () => { unsubProd(); unsubSales(); unsubExp(); };
   }, [user]);
 
+  // CALCUL DES STATISTIQUES FINANCIERES CORRIGÉ
   useEffect(() => {
-    let vUSD = 0, vCDF = 0, dUSD = 0, dCDF = 0;
+    let vUSD = 0, vCDF = 0, dUSD = 0, dCDF = 0, bUSD = 0, bCDF = 0;
+    const today = new Date().toLocaleDateString();
+
     sales.forEach(s => {
-      if (s.devise === "USD") { vUSD += Number(s.paid || 0); dUSD += Number(s.debt || 0); } 
-      else { vCDF += Number(s.paid || 0); dCDF += Number(s.debt || 0); }
+      const saleDate = s.date?.toDate().toLocaleDateString();
+      const paidAmount = Number(s.paid || 0);
+      const debtAmount = Number(s.debt || 0);
+      const margin = Number(s.benefice || 0); // Utilise la marge calculée lors de la vente
+
+      if (s.devise === "USD") { 
+        vUSD += paidAmount; 
+        dUSD += debtAmount;
+        if(saleDate === today) bUSD += margin; // Bénéfice = Somme des marges
+      } else { 
+        vCDF += paidAmount; 
+        dCDF += debtAmount;
+        if(saleDate === today) bCDF += margin;
+      }
     });
+
     expenses.forEach(e => {
-      if (e.devise === "USD") { vUSD -= Number(e.montant || 0); } 
-      else { vCDF -= Number(e.montant || 0); }
+      const expenseAmount = Number(e.montant || 0);
+      if (e.devise === "USD") { vUSD -= expenseAmount; } 
+      else { vCDF -= expenseAmount; }
+      // Note: Le bénéfice brut des ventes n'est plus diminué par les dépenses ici
     });
-    setStats(prev => ({ ...prev, ventesUSD: vUSD, ventesCDF: vCDF, dettesUSD: dUSD, dettesCDF: dCDF }));
+
+    setStats(prev => ({ 
+        ...prev, 
+        ventesUSD: vUSD, 
+        ventesCDF: vCDF, 
+        dettesUSD: dUSD, 
+        dettesCDF: dCDF,
+        beneficeUSD: bUSD,
+        beneficeCDF: bCDF
+    }));
   }, [sales, expenses]);
 
   const filteredProducts = products.filter(p => p.nom?.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -91,12 +120,13 @@ export default function DashboardAdmin() {
 
   const handleSaveProduct = async (e) => {
     e.preventDefault();
-    const data = { ...prodData, prix: Number(prodData.prix), action: Number(prodData.action), adminId: user.adminId, updatedAt: serverTimestamp() };
+    // AJOUT : prixAchat converti en nombre
+    const data = { ...prodData, prixAchat: Number(prodData.prixAchat), prix: Number(prodData.prix), action: Number(prodData.action), adminId: user.adminId, updatedAt: serverTimestamp() };
     try {
       if (editingProduct) { await updateDoc(doc(db, "produits", editingProduct.id), data); } 
       else { await addDoc(collection(db, "produits"), { ...data, createdAt: serverTimestamp() }); }
       setShowProductModal(false); setEditingProduct(null);
-      setProdData({ nom: "", prix: "", action: "", imageUrl: "", devise: "USD" });
+      setProdData({ nom: "", prixAchat: "", prix: "", action: "", imageUrl: "", devise: "USD" });
     } catch (err) { alert("Erreur: " + err.message); }
   };
 
@@ -104,14 +134,31 @@ export default function DashboardAdmin() {
     e.preventDefault();
     const prod = products.find(p => p.id === venteData.productId);
     if (!prod || prod.action < venteData.qte) return alert("Stock insuffisant !");
-    const total = prod.prix * venteData.qte;
-    const debtAmount = total - venteData.paye;
-    const saleObj = { ...venteData, productName: prod.nom, productImg: prod.imageUrl || null, unitPrice: prod.prix, total, debt: debtAmount > 0 ? debtAmount : 0, adminId: user.adminId, date: serverTimestamp() };
+    
+    const total = Number(prod.prix) * Number(venteData.qte);
+    const totalAchat = Number(prod.prixAchat || 0) * Number(venteData.qte);
+    const beneficeReel = total - totalAchat; // Calcul du bénéfice sur la vente
+    const debtAmount = total - Number(venteData.paye);
+    
+    const saleObj = { 
+        ...venteData, 
+        productName: prod.nom, 
+        productImg: prod.imageUrl || null, 
+        unitPrice: prod.prix, 
+        benefice: beneficeReel, // On enregistre le bénéfice dans la transaction
+        total: total, 
+        paid: Number(venteData.paye),
+        debt: debtAmount > 0 ? debtAmount : 0, 
+        adminId: user.adminId, 
+        date: serverTimestamp() 
+    };
+
     try {
       await addDoc(collection(db, "transactions"), saleObj);
       await updateDoc(doc(db, "produits", prod.id), { action: increment(-venteData.qte) });
       generateProfessionalPDF(saleObj, user);
       setShowVenteModal(false);
+      setVenteData({ client: "", phone: "", productId: "", qte: 1, paye: 0, devise: "USD" });
     } catch (err) { alert("Erreur: " + err.message); }
   };
 
@@ -209,6 +256,8 @@ export default function DashboardAdmin() {
               <div style={styles.statsGrid}>
                 <div style={{...styles.card, backgroundColor: theme.card, borderTop: "5px solid #27ae60"}}><small>SOLDE USD (NET)</small><h2>{stats.ventesUSD.toLocaleString()} $</h2></div>
                 <div style={{...styles.card, backgroundColor: theme.card, borderTop: "5px solid #2ecc71"}}><small>SOLDE CDF (NET)</small><h2>{stats.ventesCDF.toLocaleString()} FC</h2></div>
+                <div style={{...styles.card, backgroundColor: theme.card, borderTop: "5px solid #3498db"}}><small>BÉNÉFICE VENTES (USD)</small><h2 style={{color: '#27ae60'}}>{stats.beneficeUSD.toLocaleString()} $</h2></div>
+                <div style={{...styles.card, backgroundColor: theme.card, borderTop: "5px solid #9b59b6"}}><small>BÉNÉFICE VENTES (CDF)</small><h2 style={{color: '#2ecc71'}}>{stats.beneficeCDF.toLocaleString()} FC</h2></div>
                 <div style={{...styles.card, backgroundColor: theme.card, borderTop: "5px solid #e74c3c"}}><small>DETTES USD</small><h2>{stats.dettesUSD.toLocaleString()} $</h2></div>
                 <div style={{...styles.card, backgroundColor: theme.card, borderTop: "5px solid #c0392b"}}><small>DETTES CDF</small><h2>{stats.dettesCDF.toLocaleString()} FC</h2></div>
               </div>
@@ -239,19 +288,23 @@ export default function DashboardAdmin() {
 
           {view === 'inventaire' && (
             <div style={{...styles.section, backgroundColor: theme.card}}>
-              <button onClick={() => {setEditingProduct(null); setProdData({nom:"", prix:"", action:"", imageUrl:"", devise:"USD"}); setShowProductModal(true)}} style={styles.addBtn}>+ NOUVEL ARTICLE</button>
+              <button onClick={() => {setEditingProduct(null); setProdData({nom:"", prixAchat:"", prix:"", action:"", imageUrl:"", devise:"USD"}); setShowProductModal(true)}} style={styles.addBtn}>+ NOUVEL ARTICLE</button>
               <div style={styles.tableResponsive}>
                 <table style={styles.table}>
                   <thead style={styles.thead}>
-                    <tr><th>Photo</th><th>Désignation</th><th>Prix Unit.</th><th>Stock</th><th>Actions</th></tr>
+                    <tr><th>Photo</th><th>Désignation</th><th>Achat</th><th>Vente</th><th>Stock</th><th>Total Valeur</th><th>Actions</th></tr>
                   </thead>
                   <tbody>
                     {filteredProducts.map(p => (
                       <tr key={p.id} style={styles.tr}>
                         <td><img src={p.imageUrl || "https://via.placeholder.com/45"} style={styles.imgTable} alt=""/></td>
                         <td><b>{p.nom}</b></td>
+                        <td>{p.prixAchat?.toLocaleString()} {p.devise}</td>
                         <td>{p.prix?.toLocaleString()} {p.devise}</td>
                         <td style={{color: p.action <= 5 ? "red" : "#27ae60", fontWeight: "bold"}}>{p.action}</td>
+                        <td style={{fontWeight: "bold", color: "#34495e"}}>
+                            {(Number(p.prix) * Number(p.action)).toLocaleString()} {p.devise}
+                        </td>
                         <td>
                           <button onClick={() => {setEditingProduct(p); setProdData(p); setShowProductModal(true)}} style={styles.editBtn}>✏️</button>
                           <button onClick={async () => { if(confirm("Supprimer?")) await deleteDoc(doc(db, "produits", p.id))}} style={styles.delBtn}>🗑️</button>
@@ -260,6 +313,30 @@ export default function DashboardAdmin() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+              
+              <div style={{
+                marginTop: "30px", 
+                padding: "20px", 
+                backgroundColor: darkMode ? "#2c3e50" : "#f8f9fa", 
+                borderRadius: "12px",
+                display: "flex",
+                justifyContent: "space-around",
+                border: "2px dashed #3498db"
+              }}>
+                <div style={{textAlign: "center"}}>
+                  <small style={{color: "#7f8c8d", fontWeight: "bold"}}>VALEUR TOTALE USD</small>
+                  <h3 style={{color: "#2980b9", margin: "5px 0"}}>
+                    {products.reduce((acc, p) => p.devise === "USD" ? acc + (Number(p.prix) * Number(p.action)) : acc, 0).toLocaleString()} $
+                  </h3>
+                </div>
+                <div style={{width: "1px", backgroundColor: "#ddd"}}></div>
+                <div style={{textAlign: "center"}}>
+                  <small style={{color: "#7f8c8d", fontWeight: "bold"}}>VALEUR TOTALE CDF</small>
+                  <h3 style={{color: "#27ae60", margin: "5px 0"}}>
+                    {products.reduce((acc, p) => p.devise === "CDF" ? acc + (Number(p.prix) * Number(p.action)) : acc, 0).toLocaleString()} FC
+                  </h3>
+                </div>
               </div>
             </div>
           )}
@@ -306,6 +383,14 @@ export default function DashboardAdmin() {
                       </tr>
                     ))}
                   </tbody>
+                  <tfoot style={{background: '#f8f9fa', fontWeight: 'bold'}}>
+                    <tr>
+                      <td>TOTAL DÉPENSES</td>
+                      <td colSpan="3" style={{color: 'red'}}>
+                        {filteredExpenses.reduce((acc, curr) => curr.devise === "USD" ? acc + Number(curr.montant) : acc, 0).toLocaleString()} $ | {filteredExpenses.reduce((acc, curr) => curr.devise === "CDF" ? acc + Number(curr.montant) : acc, 0).toLocaleString()} FC
+                      </td>
+                    </tr>
+                  </tfoot>
                 </table>
               </div>
             </div>
@@ -324,11 +409,12 @@ export default function DashboardAdmin() {
               <input style={styles.input} type="text" placeholder="Désignation" value={prodData.nom} onChange={e => setProdData({...prodData, nom: e.target.value})} required/>
               <input style={styles.input} type="file" accept="image/*" onChange={handleFileChange} />
               <div style={{display: 'flex', gap: '10px'}}>
-                <input style={styles.input} type="number" placeholder="Prix" value={prodData.prix} onChange={e => setProdData({...prodData, prix: e.target.value})} required/>
-                <select style={styles.input} value={prodData.devise} onChange={e => setProdData({...prodData, devise: e.target.value})}>
-                  <option value="USD">USD</option><option value="CDF">CDF</option>
-                </select>
+                <input style={styles.input} type="number" placeholder="Prix Achat" value={prodData.prixAchat} onChange={e => setProdData({...prodData, prixAchat: e.target.value})} required/>
+                <input style={styles.input} type="number" placeholder="Prix Vente" value={prodData.prix} onChange={e => setProdData({...prodData, prix: e.target.value})} required/>
               </div>
+              <select style={styles.input} value={prodData.devise} onChange={e => setProdData({...prodData, devise: e.target.value})}>
+                <option value="USD">USD</option><option value="CDF">CDF</option>
+              </select>
               <input style={styles.input} type="number" placeholder="Stock" value={prodData.action} onChange={e => setProdData({...prodData, action: e.target.value})} required/>
               <button style={{...styles.saveBtn, background: '#1a2a3a'}} type="submit">Enregistrer</button>
               <button style={styles.cancelBtn} type="button" onClick={() => setShowProductModal(false)}>Fermer</button>
@@ -343,15 +429,15 @@ export default function DashboardAdmin() {
           <div style={{...styles.modal, backgroundColor: theme.card}}>
             <h3 style={{marginBottom: '15px'}}>Nouvelle Vente</h3>
             <form onSubmit={handleVente} style={styles.form}>
-              <input style={styles.input} type="text" placeholder="Nom du client" onChange={e => setVenteData({...venteData, client: e.target.value})} required/>
-              <select style={styles.input} onChange={e => setVenteData({...venteData, productId: e.target.value})} required>
+              <input style={styles.input} type="text" placeholder="Nom du client" value={venteData.client} onChange={e => setVenteData({...venteData, client: e.target.value})} required/>
+              <select style={styles.input} value={venteData.productId} onChange={e => setVenteData({...venteData, productId: e.target.value})} required>
                 <option value="">Sélectionner Article</option>
                 {products.map(p => <option key={p.id} value={p.id}>{p.nom} ({p.action} dispos)</option>)}
               </select>
-              <input style={styles.input} type="number" placeholder="Quantité" onChange={e => setVenteData({...venteData, qte: Number(e.target.value)})} required/>
+              <input style={styles.input} type="number" placeholder="Quantité" value={venteData.qte} onChange={e => setVenteData({...venteData, qte: Number(e.target.value)})} required/>
               <div style={{display: 'flex', gap: '10px'}}>
-                <input style={styles.input} type="number" placeholder="Payé" onChange={e => setVenteData({...venteData, paye: Number(e.target.value)})} required/>
-                <select style={styles.input} onChange={e => setVenteData({...venteData, devise: e.target.value})}>
+                <input style={styles.input} type="number" placeholder="Payé" value={venteData.paye} onChange={e => setVenteData({...venteData, paye: Number(e.target.value)})} required/>
+                <select style={styles.input} value={venteData.devise} onChange={e => setVenteData({...venteData, devise: e.target.value})}>
                   <option value="USD">USD</option><option value="CDF">CDF</option>
                 </select>
               </div>
@@ -385,6 +471,7 @@ export default function DashboardAdmin() {
   );
 }
 
+// STYLES IDENTIQUES À VOTRE CODE ORIGINAL
 const styles = {
   container: { display: "flex", minHeight: "100vh", fontFamily: "'Segoe UI', sans-serif", overflow: "hidden" },
   sidebar: { width: "250px", backgroundColor: "#1a2a3a", color: "white", padding: "20px", position: "fixed",top: "0", height: "100vh", zIndex: 2000, transition: "0.3s", display: "flex", flexDirection: "column" },
