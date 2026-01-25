@@ -1,0 +1,6 @@
+{
+  "appId": "com.votreentreprise.app",
+  "appName": "Mon App Royale",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

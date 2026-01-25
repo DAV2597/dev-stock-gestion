@@ -216,6 +216,7 @@ export default function DashboardAdmin() {
   };
 
   return (
+    
     <div style={{...styles.container, backgroundColor: theme.bg, color: theme.text}}>
       {isMobile && menuOpen && <div style={styles.overlaySidebar} onClick={() => setMenuOpen(false)} />}
 
@@ -249,7 +250,7 @@ export default function DashboardAdmin() {
             value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} 
           />
         </header>
-
+{/* TABLE DE BORD */}
         <div style={styles.scrollContainer}>
           {view === 'dashboard' && (
             <div style={styles.dashboardContent}>
@@ -408,14 +409,14 @@ export default function DashboardAdmin() {
             <form onSubmit={handleSaveProduct} style={styles.form}>
               <input style={styles.input} type="text" placeholder="Désignation" value={prodData.nom} onChange={e => setProdData({...prodData, nom: e.target.value})} required/>
               <input style={styles.input} type="file" accept="image/*" onChange={handleFileChange} />
-              <div style={{display: 'flex', gap: '10px'}}>
+              <div style={{display: 'flex', gap: '5px'}}>
                 <input style={styles.input} type="number" placeholder="Prix Achat" value={prodData.prixAchat} onChange={e => setProdData({...prodData, prixAchat: e.target.value})} required/>
                 <input style={styles.input} type="number" placeholder="Prix Vente" value={prodData.prix} onChange={e => setProdData({...prodData, prix: e.target.value})} required/>
               </div>
               <select style={styles.input} value={prodData.devise} onChange={e => setProdData({...prodData, devise: e.target.value})}>
                 <option value="USD">USD</option><option value="CDF">CDF</option>
               </select>
-              <input style={styles.input} type="number" placeholder="Stock" value={prodData.action} onChange={e => setProdData({...prodData, action: e.target.value})} required/>
+              <input style={styles.input} type="number" placeholder="Quantité" value={prodData.action} onChange={e => setProdData({...prodData, action: e.target.value})} required/>
               <button style={{...styles.saveBtn, background: '#1a2a3a'}} type="submit">Enregistrer</button>
               <button style={styles.cancelBtn} type="button" onClick={() => setShowProductModal(false)}>Fermer</button>
             </form>
@@ -434,9 +435,9 @@ export default function DashboardAdmin() {
                 <option value="">Sélectionner Article</option>
                 {products.map(p => <option key={p.id} value={p.id}>{p.nom} ({p.action} dispos)</option>)}
               </select>
-              <input style={styles.input} type="number" placeholder="Quantité" value={venteData.qte} onChange={e => setVenteData({...venteData, qte: Number(e.target.value)})} required/>
+              <input style={styles.input} type="number" placeholder="Quantité"  onChange={e => setVenteData({...venteData, qte: Number(e.target.value)})} required/>
               <div style={{display: 'flex', gap: '10px'}}>
-                <input style={styles.input} type="number" placeholder="Payé" value={venteData.paye} onChange={e => setVenteData({...venteData, paye: Number(e.target.value)})} required/>
+                <input style={styles.input} type="number" placeholder="Payé"  onChange={e => setVenteData({...venteData, paye: Number(e.target.value)})} required/>
                 <select style={styles.input} value={venteData.devise} onChange={e => setVenteData({...venteData, devise: e.target.value})}>
                   <option value="USD">USD</option><option value="CDF">CDF</option>
                 </select>
@@ -469,7 +470,7 @@ export default function DashboardAdmin() {
       )}
     </div>
   );
-}
+}{/* BARRE LATERAL */}
 
 // STYLES IDENTIQUES À VOTRE CODE ORIGINAL
 const styles = {
